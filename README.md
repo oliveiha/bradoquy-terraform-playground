@@ -1,48 +1,45 @@
-# Getting-Started-Terraform
+# Introdução-Terraform
 
-Welcome to Terraform - Getting Started.  These exercise files are meant to accompany my course on [Pluralsight](https://app.pluralsight.com/library/courses/terraform-getting-started).  The course was developed using version 0.12.5 of Terraform.  As far as I know there are no coming changes that will significantly impact the validity of these exercise files.  But I also don't control all the plug-ins, providers, and modules used by the configurations. 
+Bem-vindo ao Terraform - Introdução. 
 
-## Using the files
+## Usando os arquivos
 
-Each folder represents a module from the course and is completely self contained.  In each module there will be an example of the *tfvars* file that you will use named *terraform.tfvars.example*.  Simply update the contents of the file and rename it *terraform.tfvars*.  Due to the sensitive nature of the information you place in the *tfvars* file, **do not** check it into source control, especially a public repository.  Some of us - *read me* - have made that mistake before and had to delete AWS access keys post-haste.
+Cada pasta representa um módulo do curso e é completamente independente. Em cada módulo, haverá um exemplo do arquivo * tfvars * que você usará chamado * terraform.tfvars.example *. Simplesmente atualize o conteúdo do arquivo e renomeie-o * terraform.tfvars *. Devido à natureza sensível das informações que você coloca no arquivo * tfvars *, ** não as verifique no controle de origem, especialmente em um repositório público. Alguns de nós - * leia-me * - já cometemos esse erro antes e tivemos que excluir as chaves de acesso da AWS após a pressa.
 
-Once you have updated and renamed the *tfvars* file(s), you can run the commands in the *m#_commands.txt* file, where the *#* is the number of the module.  Be sure to run the commands from the working directory of the module.  Or you can just noodle around on the terraform CLI and see what you can discover/break.  If you run into an issue, please submit it as such and I will do my best to remediate it.
+Depois de atualizar e renomear os arquivos * tfvars *, você pode executar os comandos no arquivo * m # _commands.txt *, em que * # * é o número do módulo. Certifique-se de executar os comandos no diretório ativo do módulo. Ou você pode simplesmente mexer na CLI do terraform e ver o que pode descobrir / quebrar. Se você encontrar um problema, envie-o como tal e farei o possível para corrigi-lo.
 
-## AWS Key Pairs
+## Pares de chaves da AWS
 
-One of the most common issues reported by people is confusion over AWS Key Pairs and Regions.  The Terraform configurations make use of us-east-1 (N. Virginia) as the default region.  You can override that region by changing the default or submitting a different value for `var.region`.  The AWS Key Pair you use must be created in the same region you have selected for deployment.  You can create those keys from either the AWS EC2 Console or the AWS CLI.  If you are using the CLI, the process is very simple.
+Um dos problemas mais comuns relatados pelas pessoas é a confusão sobre os principais pares e regiões da AWS. As configurações do Terraform usam us-east-1 (N. Virginia) como região padrão. Você pode substituir essa região alterando o padrão ou enviando um valor diferente para `var.region`. O par de chaves da AWS que você usa deve ser criado na mesma região que você selecionou para implantação. Você pode criar essas chaves no AWS EC2 Console ou na AWS CLI. Se você estiver usando a CLI, o processo é muito simples.
 
-```console
-aws configure set region your_region_name
-aws ec2 create-key-pair --key-name your_key_name
-```
+`` console
+aws configurar região definida your_region_name
+aws ec2 criar-par-de-chave - nome-da-chave nome_da_chave
+`` ``
 
-The json output will include a KeyMaterial section.  Copy and paste the contents of the KeyMaterial section starting with `-----BEGIN RSA PRIVATE KEY-----` and ending with `-----END RSA PRIVATE KEY-----` to a file with a .pem extension.  Then point the *tfvars* entry for `private_key_path` to the full path for the file.
+A saída json incluirá uma seção KeyMaterial. Copie e cole o conteúdo da seção KeyMaterial começando com `----- BEGIN RSA PRIVATE KEY -----` e terminando com `----- END RSA PRIVATE KEY -----` em um arquivo com uma extensão .pem. Aponte a entrada * tfvars * para `private_key_path` para o caminho completo do arquivo.
 
-If you are using Windows, remember that the file path backslashes need to be doubled, since the single backslash is the escape character for other special characters.  For instance, the path `C:\Users\Ned\mykey.pem` should be entered as `C:\\Users\\Ned\\mykey.pem`.
+Se você estiver usando o Windows, lembre-se de que as barras invertidas do caminho do arquivo precisam ser dobradas, pois a barra invertida única é o caractere de escape para outros caracteres especiais. Por exemplo, o caminho `C: \ Users \ Ned \ mykey.pem` deve ser inserido como` C: \\ Users \\ Ned \\ mykey.pem`.
 
-## Line Endings
+## Finais de linha
 
-Another issue I have discovered from time to time is that Terraform doesn't much like the Windows style of ending a line with both a Carriage Return (CR) and a Line Feed (LF), commonly referred to as CRLF.  If you are experiencing strange parsing issues, change the line ending to be Line Feed (LF) only.  In VS Code this can be down by clicking on the CRLF in the lower right corner and changing it to LF.
+Outra questão que eu descobri de tempos em tempos é que o Terraform não gosta muito do estilo do Windows de terminar uma linha com um retorno de carro (CR) e um avanço de linha (LF), comumente referido como CRLF. Se você estiver enfrentando problemas de análise estranhos, altere a linha que termina como apenas Line Feed (LF). No código VS, isso pode ser desativado clicando no CRLF no canto inferior direito e alterando-o para LF.
 
-## MONEY!!!
+## DINHEIRO !!!
 
-A gentle reminder about cost.  The course will have you creating resources in AWS and Azure.  Some of the resources are not going to be 100% free.  In most cases I have tried to use the [Free-tier](https://aws.amazon.com/free/) when possible, but in some cases I have elected to use a larger size EC2 instance to demonstrate the possibilities with multiple environments.  
+Um lembrete gentil sobre custo. O curso fará com que você crie recursos na AWS e no Azure. Alguns dos recursos não serão 100% gratuitos. Na maioria dos casos, tentei usar o [Free-tier] (https://aws.amazon.com/free/) quando possível, mas em alguns casos eu escolhi usar uma instância de EC2 de tamanho maior para demonstrar as possibilidades com ambientes múltiplos.
 
-The DNS zone in Azure is also not completely free.  You are going to need to buy a DNS domain, if you don't already have one, and set the Name Server to use Azure DNS.  If you go with an off-brand TLD like .xyz, you should be able to pick up a domain name for about $0.99 for the first year.  Azure DNS is about $.50 per zone per month and $0.40 per million queries.  All in, you're looking at about $2 for a DNS zone.
+A zona DNS no Azure também não é totalmente gratuita. Você precisará comprar um domínio DNS, se ainda não tiver um, e definir o Servidor de Nomes para usar o DNS do Azure. Se você optar por um TLD de marca externa como .xyz, poderá conseguir um nome de domínio por cerca de US $ 0,99 no primeiro ano. O DNS do Azure é de cerca de US $ 0,50 por zona por mês e US $ 0,40 por milhão de consultas. No geral, você está procurando cerca de US $ 2,00 por uma zona DNS.
 
-When you complete an exercise in the course, be sure to tear down the infrastructure.  Each exercise file ends with `terraform destroy`.  Just run that command and approve the destruction to remove all resources from AWS.
+Ao concluir um exercício no curso, desmonte a infraestrutura. Cada arquivo de exercício termina com `terraform destroy '. Basta executar esse comando e aprovar a destruição para remover todos os recursos da AWS.
 
-## Certification
+## Certificação
 
-HashiCorp will be releasing the *Terraform Certified Associate* certification in the near future - depending on when you're reading this it might already be out.  You might be wondering if this course fully prepares you for the cert.  **It does not.**  Taking this course along with the [Deep Dive - Terraform](https://app.pluralsight.com/library/courses/deep-dive-terraform) course on Pluralsight will meet most of the learning objectives for the certification, but there is no substitute for running the software on your own and hacking away.
+A HashiCorp estará lançando a certificação * Terraform Certified Associate * em um futuro próximo - dependendo de quando você estiver lendo isso, ela já estará disponível. Você pode estar se perguntando se este curso o prepara totalmente para o certificado. ** Não. ** Fazer este curso junto com o curso [Deep Dive - Terraform] (https://app.pluralsight.com/library/courses/deep-dive-terraform) sobre o Pluralsight atenderá a maior parte do aprendizado objetivos para a certificação, mas não há substituto para a execução do software por si próprio e a remoção.
 
-I am working on a certification guide with two other authors, and I will provide a link once that is ready.  This is an unofficial guide, but I believe in concert with the Pluralsight courses you will be in a good position to sit the exam.
+Estou trabalhando em um guia de certificação com outros dois autores e fornecerei um link assim que estiver pronto. Este é um guia não oficial, mas acredito que, em conjunto com os cursos da Pluralsight, você estará em uma boa posição para fazer o exame.
 
-## Conclusion
+## Conclusão
 
-I hope you enjoy taking this course as much as I did creating it.  I'd love to hear feedback and suggestions for revisions.
+Espero que você goste de fazer este curso tanto quanto eu
 
-Thanks and happy automating!
-
-Ned
