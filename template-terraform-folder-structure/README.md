@@ -25,6 +25,60 @@ pré (pré-produção/encenação). Um ambiente para fins de teste. Atua como um
 
 rev (revisão). Ambientes dinâmicos de curta duração. Gira sob demanda. Podemos ter muitos deles. Imita o ambiente de pré-produção.
 
+## Estrutura proposta
+
+.
+├── infrastructure
+│   ├── environments
+│   │   ├── com
+│   │   ├── pre
+│   │   ├── pro
+│   │   │   ├── config.tf
+│   │   │   ├── db
+│   │   │   │   ├── config.tf
+│   │   │   │   ├── main.tf
+│   │   │   │   ├── outputs.tf
+│   │   │   │   └── variables.tf
+│   │   │   ├── main.tf
+│   │   │   ├── outputs.tf
+│   │   │   └── variables.tf
+│   │   └── rev
+│   └── modules
+│       ├── app
+│       │   ├── main.tf
+│       │   ├── outputs.tf
+│       │   └── variables.tf
+│       ├── db
+│       └── queue
+├── package.json
+└── src
+    └── index.js
+    
+Antes de começarmos a dividir a ideia em fatores primos, vamos verificar como é simples e explícito implantar no pré e no pro a partir de uma máquina local.
+
+```bash
+$ cd infraestrutura/ambientes/pre 
+$ terraform init 
+$ terraform apply 
+$ cd ../../../infrastructure/environments/pro 
+$ terraform init 
+$ terraform apply
+```
+
+Isso funciona para sistemas bastante complexos à medida que o usamos em nosso projeto. 
+Achei essa facilidade de implantação (e de reversão se algo der errado) muito agradável 😊.
+
+## Vamos analisar a estrutura de pastas e partir do topo.
+
+├── infrastructure # Terraform configurations
+└── src            # An app code
+
+Em um diretório, mantemos as coisas relacionadas à infraestrutura e, no segundo, mantemos um código do aplicativo.
+
+## A essência
+Indo mais fundo na pasta "infrastructure", você encontrará "environments" e "modules". 
+Dentro do "environments", temos um diretório separado para cada ambiente. No "modules", você encontra módulos Terraform importados por pelo menos dois ambientes (DRY).
+
 
 
 # Deploy
