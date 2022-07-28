@@ -26,7 +26,7 @@ pré (pré-produção/encenação). Um ambiente para fins de teste. Atua como um
 rev (revisão). Ambientes dinâmicos de curta duração. Gira sob demanda. Podemos ter muitos deles. Imita o ambiente de pré-produção.
 
 ## Estrutura proposta
-
+```
 .
 ├── infrastructure
 │   ├── environments
@@ -53,7 +53,7 @@ rev (revisão). Ambientes dinâmicos de curta duração. Gira sob demanda. Podem
 ├── package.json
 └── src
     └── index.js
-    
+```    
 Antes de começarmos a dividir a ideia em fatores primos, vamos verificar como é simples e explícito implantar no pré e no pro a partir de uma máquina local.
 
 ```bash
