@@ -70,8 +70,8 @@ Achei essa facilidade de implantação (e de reversão se algo der errado) muito
 
 ## Vamos analisar a estrutura de pastas e partir do topo.
 ```
-├── infrastructure # Terraform configurations
-└── src            # An app code
+├── infrastructure # configurações do terraform
+└── src            # codigo da app 
 ```
 Em um diretório, mantemos as coisas relacionadas à infraestrutura e, no segundo, mantemos um código do aplicativo.
 
