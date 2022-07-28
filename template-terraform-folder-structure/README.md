@@ -69,10 +69,10 @@ Isso funciona para sistemas bastante complexos à medida que o usamos em nosso p
 Achei essa facilidade de implantação (e de reversão se algo der errado) muito agradável 😊.
 
 ## Vamos analisar a estrutura de pastas e partir do topo.
-
+```
 ├── infrastructure # Terraform configurations
 └── src            # An app code
-
+```
 Em um diretório, mantemos as coisas relacionadas à infraestrutura e, no segundo, mantemos um código do aplicativo.
 
 ## A essência
