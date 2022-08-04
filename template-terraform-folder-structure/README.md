@@ -103,7 +103,7 @@ A solução proposta terá mais linhas de código, mas ainda deixará espaço pa
 Apenas uma observação sobre os workspaces. Não o use para diferenciar ambientes. [Mesmo os autores não recomendam isso](https://www.terraform.io/language/state/workspaces#when-to-use-multiple-workspaces) . Depois, apresentarei um bom caso de uso para workspaces.
 
 ## Conta secundaria da AWS
-Como é possívelnão precise reautenticar (ou alterar um valor de AWS_PROFILE) quando estou alternando um contexto de contas da AWS?
+Como é possível não precisar reautenticar (ou alterar um valor de AWS_PROFILE) quando estou alternando um contexto de contas da AWS?
 
 ```bash
 cd infraestructure/environments/pre 
@@ -111,7 +111,20 @@ $ terraform apply
 # Recursos implantados na conta AWS de teste $ cd ../../../infrastructure/environments/pro $ terraform apply 
 # Recursos implantados na conta AWS de produção # E simplesmente funciona
 ```
-Em qualquer config.tf contidos nos módulo raiz dos environments, você encontrará a seguinte parte:
+Em qualquer config.tf contidos nos módulo raiz dos environments, você encontrará a seguinte bloco:
+
+```tf
+provider "aws" {
+  # ...
+
+  assume_role {
+    role_arn = "arn:aws:iam::${var.aws_account_id}:role/AssumableAdmin"
+  }
+
+  # ...
+}
+```
+
 
 
 
