@@ -1,29 +1,30 @@
 ## Requisitos
 Vamos revisar quais casos de uso a estrutura proposta abrangerá:
 
-AWS como provedor de nuvem. Isso também pode ser aplicado a outros, pois o Terraform oferece suporte a muitos provedores diferentes.
-Configuração de várias contas da AWS. Uma conta para cargas de trabalho de produção e outra para fins de teste.
-Recursos cruciais (por exemplo, banco de dados) implantados manualmente e sob demanda.
-Ambientes dinâmicos de curta duração para dar suporte a aplicativos para filiais.
-Compartilhamento e referência de recursos criados por outra configuração do Terraform.
-** Desenvolvimento local sem atrito.
-Capacidade de implantar a partir de uma máquina local sem um fluxo de autenticação complexo.
-Atuar no contexto de uma determinada conta da AWS assumindo uma função.
-Estados do Terraform armazenados em uma conta da AWS separada.
+* AWS como provedor de nuvem. Isso também pode ser aplicado a outros, pois o Terraform oferece suporte a muitos provedores diferentes.
+* Configuração de várias contas da AWS. Uma conta para cargas de trabalho de produção e outra para fins de teste.
+* Recursos cruciais (por exemplo, banco de dados) implantados manualmente e sob demanda.
+* Ambientes dinâmicos de curta duração para dar suporte a aplicativos para filiais.
+* Compartilhamento e referência de recursos criados por outra configuração do Terraform.
+* Desenvolvimento local sem atrito.
+* Capacidade de fazer deploy a partir de uma máquina local sem um fluxo de autenticação complexo.
+* Atuar no contexto de uma determinada conta da AWS assumindo uma função.
+* Tfstates armazenados em uma conta da AWS separada.
 
 ## Contexto
-O diagrama da infraestrutura gerenciada pelo repositório é mostrado abaixo. Conforme mencionado, temos duas contas da AWS nas quais nossa infraestrutura opera. Você provavelmente está familiarizado com essa configuração, pois é bastante comum. Existe algum tipo de tópico que transmite eventos que podem ser consumidos por muitas filas e processados ​​por um aplicativo. O resultado disso precisa ser armazenado em armazenamento persistente, que no nosso caso é uma tabela do DynamoDB.
+O diagrama da infraestrutura gerenciada pelo repositório é mostrado abaixo. Conforme mencionado, temos duas contas da AWS nas quais nossa infraestrutura opera. Você provavelmente está familiarizado com essa configuração, pois é bastante comum. 
+Existe algum tipo de tópico que transmite eventos que podem ser consumidos por muitas filas e processados ​​por um aplicativo. O resultado disso precisa ser armazenado em armazenamento persistente, que no nosso caso é uma tabela do DynamoDB.
 ![Environment](images/01.png)
 
 ## Os recursos são atribuídos a um determinado ambiente:
 
-com (comum). Conjunto de componentes compartilhados por muitos. No exemplo, temos um tópico game-score no AWS SNS que pode ter muitos consumidores.
+* com (comum). Conjunto de componentes compartilhados por muitos. No exemplo, temos um tópico game-score no AWS SNS que pode ter muitos consumidores.
 
-profissional (produção)
+* profissional (produção)
 
-pré (pré-produção/encenação). Um ambiente para fins de teste. Atua como um portão antes da produção. Espelha o ambiente de produção.
+* pré (pré-produção). Um ambiente para fins de teste. Atua como um portão antes da produção. Espelha o ambiente de produção.
 
-rev (revisão). Ambientes dinâmicos de curta duração. Gira sob demanda. Podemos ter muitos deles. Imita o ambiente de pré-produção.
+* rev (revisão). Ambientes dinâmicos de curta duração. provisionado sob demanda. Podemos ter muitos deles. Cópia do ambiente de pré-produção.
 
 ## Estrutura proposta
 ```
@@ -66,7 +67,7 @@ $ terraform apply
 ```
 
 Isso funciona para sistemas bastante complexos à medida que o usamos em nosso projeto. 
-Achei essa facilidade de implantação (e de reversão se algo der errado) muito agradável 😊.
+Achei essa facilidade de implantação (e de reversão se algo der errado) muito fácil.
 
 ## Vamos analisar a estrutura de pastas e partir do topo.
 ```
@@ -192,19 +193,69 @@ Você já ouviu falar sobre review apps? É uma estratégia de deploy, git flow.
 
 *- workspaces não default geralmente estão relacionados a feature branchs no repositório.*
 
-# Deploy
+Como é na prática? 
+Dê uma olhada no arquivo main.tf no direorio rev. Basicamente, apenas importamos e usamos o módulo pre. 
+Como teremos muitos ambientes diferentes nas mesmas contas da AWS (já que os ambientes pré e rev são implantados na conta de teste da AWS), precisamos distingui-los de alguma forma. Podemos marcá-los e anexar um prefixo aos nomes dos recursos.
 
-Deploying temporary review environment using Terraform workspaces:
+```tf
+moodule "deployment" {
+  source = "../pre"
 
+  environment = terraform.workspace
+  prefix      = "${terraform.workspace}-"
+}
 ```
-$ tfenv install
-$ tfenv use
+O provisionamento e a destruição de ambientes de revisão podem ser feitos facilmente a partir da CLI.
+
+```bash
 $ cd infrastructure/environments/rev
 $ terraform init
-$ terraform workspace new foo-bar-1
+# # Para provisioná-los
+# Revise o aplicativo chamado foo-1
+$ terraform workspace new foo-1
 $ terraform apply
+# Revise o aplicativo chamado bar-2
+$ terraform workspace new bar-2
+$ terraform apply
+# Para destruí-los
+# Revise o aplicativo chamado foo-1
+$ terraform workspace select foo-1
 $ terraform destroy
-$ terraform workspace select default
-$ terraform workspace delete foo-bar-1
+$ terraform workspace delete foo-1
+# Revise o aplicativo chamado bar-2
+$ terraform workspace select bar-2
+$ terraform destroy
+$ terraform workspace delete bar-2
 ```
+
+## Compartilhamento e referência
+
+Na arquitetura apresentada, temos um tópico que transmite eventos para muitos consumers. Os consumers estão em ambientes diferentes. Temos uma parte comum para cada um deles. Soa familiar? Novamente, um cenário bastante comum para o qual precisamos estar preparados.
+
+Onde você deve colocar esses recursos? No ambiente pro? No CI/CD, você preferencialmente implantaria o ambiente pré antes do pro. Se pre tiver uma dependência na forma de pro, ela poderá ser interrompida por alguns minutos até que todo o processo de implantação termine. Essa dependência também é bastante oculta. Para enfrentar este problema pode-se criar um ambiente comum artificial, que chamamos de com. Esse ambiente é sempre implantado como primeiro. Para referenciar recursos criados por com em pre ou pro , basta ler os valores de saída (você se lembra do arquivo outputs.tf?) no módulo com. Os valores são armazenados em um tfstate.
+
+```tf
+data "terraform_remote_state" "common" {
+  backend = "s3"
+  config = {
+    dynamodb_table = "terraform-locks"
+    bucket         = "terraform-tfstate-payment"
+    encrypt        = true
+    key            = "infrastructure/environments/com/template-terraform-folder-strucutre/common.tfstate"
+    region         = "eu-north-1"
+    role_arn       = "arn:aws:iam::<bastion_account_id>:role/TerraformState"
+  }
+}
+
+resource "aws_sns_topic_subscription" "results_updates_sqs_target" {
+    topic_arn = data.terraform_remote_state.common.outputs.sns_game_scores_arn
+    protocol  = "sqs"
+    endpoint  = aws_sqs_queue.game_scores.arn
+}
+```
+
+## Resumo
+Todas as dicas que mostrei foram testadas em cenários de casos reais e em ambientes de produção. 
+Com eles, você será capaz de domar a maioria dos cenários. Use-os como inspiração para criar soluções que atendam às suas necessidades.
+
 
