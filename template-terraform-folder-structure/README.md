@@ -125,6 +125,13 @@ provider "aws" {
 }
 ```
 
+Esta parte é responsável por assumir um papel. Essa abordagem é descrita no guia do Terraform Use AssumeRole para provisionar recursos da AWS entre contas . 
+A ideia de assumir é bem simples. Permite que a conta A da AWS atue no contexto da conta B da AWS. No nosso caso, permite que a conta bastion atue no contexto de produção ou conta de teste na AWS. 
+
+O que é uma conta bastion? Vou escrever sobre ela em outro artigo com mais detalhes. Por enquanto, você só precisa saber que estamos usando essa conta para centralizar o gerenciamento de permissões do IAM, armazenamento de tfstate e bloqueios. 
+Para provisionar com o Terraform, você precisa de um usuário do IAM, um bucket do S3 e uma tabela do DynamoDB. Você enfrentará um dilema da galinha ou do ovo. Decidimos mover essa parte para uma conta separada da AWS (bastion). Ele nos permite (em teoria) recriar todos os recursos em uma determinada conta da AWS apenas executando o Terraform.
+![Bastion](images/02.png)
+
 
 
 
