@@ -154,6 +154,43 @@ Cada módulo raiz consiste em 4 arquivos, nem mais, nem menos. Cada um tem seu p
 * outputs.tf. Conjunto de saídas do módulo. Você pode consumi-los ainda mais em scripts de shell ou referenciá-los no módulo pai.
 * variables.tf. Conjunto de entradas de módulos. Para cada valor, sempre especificamos o argumento de descrição para fins de autodocumentação. Pense neles como campos de *classe pública*, enquanto os valores definidos no bloco local são *privados*.
 
+## Componentes de porcelana
+Existem algumas situações em que você não deseja dar controle sobre seus recursos a scripts automatizados em seu pipeline de CI/CD. Você consegue pensar em algum? Muitas vezes, é um banco de dados . Quem sabe o que pode acontecer quando você faz um push na branch master? Todos nós conhecemos histórias em que um banco de dados capotou de repente: porque uma atualização de uma versão ou tipo de instância foi acionada. Portanto, às vezes você gostaria de implantar alterações sob demanda e de sua máquina local na frente de todos. Vamos ver como isso pode ser na prática.
+
+Abaixo segue nossa estrutura.
+
+```bash
+. 
+└── infraestructure
+    └── environments 
+        └── pro 
+            ├── config.tf 
+            ├── db
+             │ ├── config.tf 
+            │ ├── main.tf
+             │ ├── outputs.tf │ └── outputs.tf 
+            │ └─ 
+            ├── main.tf
+             ├── outputs.tf 
+            └── variables.tf
+```
+Provisionamento de recursos em ambiente pro usando uma linha de comando.
+
+```bash
+$ cd infraestructure/environments/pro 
+$ terraform apply 
+# Todos os recursos exceto um banco de dados foram implantados
+ $ cd db 
+$ terraform apply 
+# Apenas um banco de dados foi implantado
+```
+
+## Ambientes dinâmicos
+Você já ouviu falar sobre review apps? É uma estratégia de deploy, git flow. Digamos que você esteja trabalhando em alguma feature e queira dar ao seu PM ou outros desenvolvedores a capacidade de testá-los antes de fazer merge na branch master e sem pedir que eles testem em um ambiente local. Se você tiver uma configuração sem servidor, não custará quase nada, pois você paga pelo uso, não pelos recursos implantados em si. No repositório, você encontrará um arquivo .tarvis.yml onde poderá encontrar como aplicar esta estratégia. A ideia é simples. Para cada commit na branch de feature, você provisiona um ambiente que espelha o ambiente anterior. Este é o caso de uso perfeito para workspaces do Terraform!
+
+*- O uso comum para multiplos workspaces é para criar uma cópia paralela e distinta de um conjunto de infraestrutura para testar um conjunto de alterações antes de modificar a infraestrutura de produção principal.*
+
+*- workspaces não default geralmente estão relacionados a feature branchs no repositório.*
 
 # Deploy
 
