@@ -134,7 +134,18 @@ Para provisionar com o Terraform, você precisa de um usuário do IAM, um bucket
 
 ![Bastion](images/02.png)
 
+Xablauu… e config.tf
 
+```tf
+. 
+└── infraestrutura 
+    └── ambientes 
+        └── pro 
+            ├── config.tf
+             ├── main.tf
+             ├── outputs.tf
+             └── variables.tf
+```             
 
 
 # Deploy
