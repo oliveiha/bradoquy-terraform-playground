@@ -100,7 +100,7 @@ A solução proposta terá mais linhas de código, mas ainda deixará espaço pa
  Bons programadores escrevem código que os humanos podem entender.” 
  — por Martin Fowler
 
-Apenas uma observação sobre os workspaces. Não o use para diferenciar ambientes. [Mesmo os autores](https://www.terraform.io/language/state/workspaces#when-to-use-multiple-workspaces) . Depois, apresentarei um bom caso de uso para workspaces.
+Apenas uma observação sobre os workspaces. Não o use para diferenciar ambientes. [Mesmo os autores não recomendam isso](https://www.terraform.io/language/state/workspaces#when-to-use-multiple-workspaces) . Depois, apresentarei um bom caso de uso para workspaces.
 
 ## Conta secundaria da AWS
 Como é possívelnão precise reautenticar (ou alterar um valor de AWS_PROFILE) quando estou alternando um contexto de contas da AWS?
