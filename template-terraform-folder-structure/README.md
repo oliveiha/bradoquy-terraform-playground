@@ -149,10 +149,10 @@ Xablauu… e config.tf
 
 Cada módulo raiz consiste em 4 arquivos, nem mais, nem menos. Cada um tem seu papel claramente especificado.
 
-*config.tf. Para não introduzir ruído no topo do arquivo main.tf, decidimos mover a configuração do backend e dos provedores para um arquivo separado.
-*main.tf. Aqui, você encontrará definições de todos os recursos gerenciados por um módulo.
-*outputs.tf. Conjunto de saídas do módulo. Você pode consumi-los ainda mais em scripts de shell ou referenciá-los no módulo pai.
-*variables.tf. Conjunto de entradas de módulos. Para cada valor, sempre especificamos o argumento de descrição para fins de autodocumentação. Pense neles como campos de *classe pública*, enquanto os valores definidos no bloco local são *privados*.
+* config.tf. Para não introduzir ruído no topo do arquivo main.tf, decidimos mover a configuração do backend e dos provedores para um arquivo separado.
+* main.tf. Aqui, você encontrará definições de todos os recursos gerenciados por um módulo.
+* outputs.tf. Conjunto de saídas do módulo. Você pode consumi-los ainda mais em scripts de shell ou referenciá-los no módulo pai.
+* variables.tf. Conjunto de entradas de módulos. Para cada valor, sempre especificamos o argumento de descrição para fins de autodocumentação. Pense neles como campos de *classe pública*, enquanto os valores definidos no bloco local são *privados*.
 
 
 # Deploy
